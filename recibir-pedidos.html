@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Cocina — Pedidos Entrantes</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap');
+:root{
+  --verde-hoja:#2F5233;
+  --verde-claro:#8CAF3C;
+  --crema:#FBF8F1;
+  --crema-osc:#F1EBDD;
+  --carbon:#232620;
+  --gris:#6B6F64;
+  --alerta:#C1440E;
+  --azul:#3B6E91;
+  --borde:#DDD5C2;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui: 'Inter', system-ui, sans-serif;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; font-family:var(--font-ui); background:var(--crema); color:var(--carbon); min-height:100vh;
+}
+.topbar{
+  padding:20px 28px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  border-bottom:1.5px solid var(--borde); background:#fff; position:sticky; top:0; z-index:10;
+}
+.brand{ font-family:var(--font-display); font-weight:700; font-size:24px; color:var(--verde-hoja); }
+.brand span{ color:var(--verde-claro); }
+.live-dot{
+  display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--gris);
+}
+.live-dot::before{
+  content:""; width:8px; height:8px; border-radius:50%; background:var(--verde-claro);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+.tabs{
+  display:flex; gap:8px; padding:14px 28px 0; flex-wrap:wrap;
+}
+.tab{
+  padding:8px 16px; border-radius:20px; font-weight:700; font-size:13.5px; cursor:pointer;
+  border:1.5px solid var(--borde); background:#fff; color:var(--gris);
+}
+.tab.active{ background:var(--carbon); color:#fff; border-color:var(--carbon); }
+
+.board{
+  padding:20px 28px 60px;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+  gap:18px;
+}
+.empty-state{
+  padding:60px 20px; text-align:center; color:var(--gris); font-size:15px; grid-column:1/-1;
+}
+
+.card{
+  background:#fff; border:1.5px solid var(--borde); border-radius:18px; padding:18px 18px 16px;
+  border-left:5px solid var(--gris);
+}
+.card.recibido{ border-left-color: var(--alerta); }
+.card.en_preparacion{ border-left-color: var(--azul); }
+.card.listo{ border-left-color: var(--verde-claro); opacity:0.75; }
+
+.card-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+.card-num{ font-family:var(--font-display); font-weight:700; font-size:20px; }
+.card-time{ font-size:12.5px; color:var(--gris); font-weight:600; }
+
+.card-status{
+  display:inline-block; font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:12px;
+  text-transform:uppercase; letter-spacing:0.03em;
+}
+.card-status.recibido{ background:#FBEAE0; color:var(--alerta); }
+.card-status.en_preparacion{ background:#E4EEF4; color:var(--azul); }
+.card-status.listo{ background:#EAF1DE; color:var(--verde-hoja); }
+
+.card-block{ margin-bottom:8px; font-size:14px; }
+.card-block b{ color:var(--gris); font-weight:700; font-size:12px; display:block; margin-bottom:2px; text-transform:none; }
+
+.card-total{
+  margin-top:10px; padding-top:10px; border-top:1px dashed var(--borde);
+  display:flex; justify-content:space-between; font-weight:800; font-size:15px;
+}
+
+.card-actions{ margin-top:14px; display:flex; gap:8px; }
+.btn-action{
+  flex:1; padding:11px; border-radius:10px; border:none; font-weight:800; font-size:13.5px; cursor:pointer; font-family:var(--font-ui);
+}
+.btn-prep{ background:var(--azul); color:#fff; }
+.btn-listo{ background:var(--verde-hoja); color:#fff; }
+.btn-listo.secondary{ background:var(--crema-osc); color:var(--carbon); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Verde<span>Bowl</span> — Cocina</div>
+  <div class="live-dot">En vivo</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-filter="activos">Activos</div>
+  <div class="tab" data-filter="recibido">Recibidos</div>
+  <div class="tab" data-filter="en_preparacion">En preparación</div>
+  <div class="tab" data-filter="listo">Listos</div>
+  <div class="tab" data-filter="todos">Todos</div>
+</div>
+
+<div class="board" id="board"></div>
+
+<script>
+const SUPABASE_URL = "https://vsmmqexrkknfxmvefhvy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Z35kZsS6DltwhDSpD1UteA_ZQttEyEe";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let pedidos = [];
+let filtro = "activos";
+
+function timeAgo(iso){
+  const diff = Math.floor((Date.now() - new Date(iso).getTime())/60000);
+  if(diff < 1) return "justo ahora";
+  if(diff === 1) return "hace 1 min";
+  return "hace " + diff + " min";
+}
+
+function statusLabel(s){
+  return { recibido:"Recibido", en_preparacion:"En preparación", listo:"Listo" }[s] || s;
+}
+
+function fmt(n){ return "$" + n.toLocaleString("es-CO"); }
+
+function render(){
+  const board = document.getElementById("board");
+  let list = pedidos.slice().sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+
+  if(filtro === "activos") list = list.filter(p => p.estado !== "listo");
+  else if(filtro !== "todos") list = list.filter(p => p.estado === filtro);
+
+  if(list.length === 0){
+    board.innerHTML = '<div class="empty-state">No hay pedidos aquí por ahora.</div>';
+    return;
+  }
+
+  board.innerHTML = list.map(p => `
+    <div class="card ${p.estado}">
+      <div class="card-head">
+        <div class="card-num">Bowl #${String(p.numero_pedido).padStart(3,"0")}</div>
+        <div class="card-time">${timeAgo(p.created_at)}</div>
+      </div>
+      <div class="card-status ${p.estado}">${statusLabel(p.estado)}</div>
+
+      <div class="card-block"><b>Vegetales</b>${p.vegetales.join(", ")}</div>
+      <div class="card-block"><b>Base</b>${p.base}</div>
+      <div class="card-block"><b>Complementos</b>${p.complementos.join(", ")}</div>
+      <div class="card-block"><b>Proteína</b>${p.proteina}</div>
+      <div class="card-block"><b>Salsa</b>${p.salsa}</div>
+
+      <div class="card-total"><span>Total</span><span>${fmt(p.total)}</span></div>
+
+      <div class="card-actions">
+        ${p.estado === "recibido" ? `<button class="btn-action btn-prep" onclick="updateEstado(${p.id}, 'en_preparacion')">Empezar</button>` : ""}
+        ${p.estado === "en_preparacion" ? `<button class="btn-action btn-listo" onclick="updateEstado(${p.id}, 'listo')">Marcar listo</button>` : ""}
+        ${p.estado === "recibido" ? `<button class="btn-action btn-listo secondary" onclick="updateEstado(${p.id}, 'listo')">Listo</button>` : ""}
+      </div>
+    </div>
+  `).join("");
+}
+
+async function updateEstado(id, nuevoEstado){
+  const { error } = await sb.from("pedidos").update({ estado: nuevoEstado }).eq("id", id);
+  if(error){ alert("No se pudo actualizar el pedido."); return; }
+  const p = pedidos.find(x => x.id === id);
+  if(p) p.estado = nuevoEstado;
+  render();
+}
+
+async function loadPedidos(){
+  const { data, error } = await sb
+    .from("pedidos")
+    .select("*")
+    .order("created_at", { ascending:false })
+    .limit(100);
+  if(!error && data){
+    pedidos = data;
+    render();
+  }
+}
+
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick = () => {
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    filtro = tab.dataset.filter;
+    render();
+  };
+});
+
+// Realtime subscription
+sb
+  .channel("pedidos-cambios")
+  .on("postgres_changes", { event: "INSERT", schema: "public", table: "pedidos" }, payload => {
+    pedidos.unshift(payload.new);
+    render();
+  })
+  .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pedidos" }, payload => {
+    const idx = pedidos.findIndex(p => p.id === payload.new.id);
+    if(idx >= 0) pedidos[idx] = payload.new;
+    render();
+  })
+  .subscribe();
+
+// Refresh relative times every 30s
+setInterval(render, 30000);
+
+loadPedidos();
+</script>
+</body>
+</html>
