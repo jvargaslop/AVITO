@@ -36,7 +36,20 @@ body{
 }
 @media (max-width: 860px){
   .app{ grid-template-columns: 1fr; }
-  .summary{ order:-1; position:sticky; top:0; z-index:20; }
+  .main{ padding-bottom:210px; }
+  .summary{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    display:flex; flex-direction:column;
+    padding:12px 18px 18px;
+    max-height:78vh;
+    box-shadow:0 -8px 24px rgba(0,0,0,0.25);
+  }
+  .summary-title{ display:none; }
+  .summary-details{ order:1; display:none; overflow-y:auto; max-height:48vh; margin-bottom:8px; }
+  .summary.expanded .summary-details{ display:block; }
+  .summary-toggle{ display:flex; order:2; }
+  .summary-total{ order:3; border-top:none; margin-top:6px; padding-top:0; }
+  .summary.expanded .summary-toggle-icon{ transform:rotate(180deg); }
 }
 
 /* HEADER */
@@ -215,6 +228,27 @@ body{
   margin-bottom:18px;
   letter-spacing:-0.01em;
 }
+.summary-details{ }
+.summary-toggle{
+  display:none;
+  width:100%;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(255,255,255,0.08);
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  font-family:var(--font-ui);
+  font-weight:700;
+  font-size:14px;
+  padding:10px 14px;
+  cursor:pointer;
+  margin-bottom:2px;
+}
+.summary-toggle-icon{
+  transition: transform .2s ease;
+  font-size:13px;
+}
 .cat-block{margin-bottom:16px;}
 .cat-head{
   font-size:13px;
@@ -386,28 +420,35 @@ body{
     </div>
   </div>
 
-  <div class="summary">
+  <div class="summary" id="summaryPanel">
     <div class="summary-title">TU BOWL</div>
 
-    <div class="cat-block">
-      <div class="cat-head">🥬 Vegetales</div>
-      <ul class="cat-items" id="sumVeg"></ul>
-    </div>
-    <div class="cat-block">
-      <div class="cat-head">🍚 Base</div>
-      <ul class="cat-items" id="sumBase"></ul>
-    </div>
-    <div class="cat-block">
-      <div class="cat-head">➕ Complementos</div>
-      <ul class="cat-items" id="sumComp"></ul>
-    </div>
-    <div class="cat-block">
-      <div class="cat-head">🍗 Proteína</div>
-      <ul class="cat-items" id="sumProt"></ul>
-    </div>
-    <div class="cat-block">
-      <div class="cat-head">🥑 Salsa</div>
-      <ul class="cat-items" id="sumSalsa"></ul>
+    <button class="summary-toggle" id="summaryToggleBtn" onclick="toggleSummaryDetails()">
+      <span id="summaryToggleLabel">Ver ingredientes</span>
+      <span class="summary-toggle-icon" id="summaryToggleIcon">▾</span>
+    </button>
+
+    <div class="summary-details" id="summaryDetails">
+      <div class="cat-block">
+        <div class="cat-head">🥬 Vegetales</div>
+        <ul class="cat-items" id="sumVeg"></ul>
+      </div>
+      <div class="cat-block">
+        <div class="cat-head">🍚 Base</div>
+        <ul class="cat-items" id="sumBase"></ul>
+      </div>
+      <div class="cat-block">
+        <div class="cat-head">➕ Complementos</div>
+        <ul class="cat-items" id="sumComp"></ul>
+      </div>
+      <div class="cat-block">
+        <div class="cat-head">🍗 Proteína</div>
+        <ul class="cat-items" id="sumProt"></ul>
+      </div>
+      <div class="cat-block">
+        <div class="cat-head">🥑 Salsa</div>
+        <ul class="cat-items" id="sumSalsa"></ul>
+      </div>
     </div>
 
     <div class="summary-total">
@@ -612,6 +653,24 @@ function render(){
   renderAllChips();
   renderCounts();
   renderSummary();
+  updateSummaryToggleLabel();
+}
+
+function toggleSummaryDetails(){
+  document.getElementById("summaryPanel").classList.toggle("expanded");
+  updateSummaryToggleLabel();
+}
+
+function updateSummaryToggleLabel(){
+  const panel = document.getElementById("summaryPanel");
+  const label = document.getElementById("summaryToggleLabel");
+  const expanded = panel.classList.contains("expanded");
+  if(expanded){
+    label.textContent = "Ocultar ingredientes";
+  } else {
+    const totalSelected = state.veg.length + state.base.length + state.comp.length + state.prot.length + state.salsa.length;
+    label.textContent = totalSelected > 0 ? "Ver ingredientes (" + totalSelected + ")" : "Ver ingredientes";
+  }
 }
 
 // ---------- FREE TEXT PARSING ----------
@@ -717,6 +776,7 @@ document.getElementById("btnConfirmar").onclick = async () => {
   document.getElementById("confirmTotal").textContent = "Total: " + fmt(total);
 
   document.getElementById("confirmScreen").classList.remove("hidden");
+  document.getElementById("summaryPanel").classList.remove("expanded");
 };
 
 document.getElementById("btnNuevo").onclick = () => {
