@@ -20,14 +20,12 @@
   --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0; height:100%;}
-html{ height:-webkit-fill-available; }
+html,body{margin:0;padding:0;}
 body{
   font-family:var(--font-ui);
   background:var(--crema);
   color:var(--carbon);
   min-height:100vh;
-  min-height:-webkit-fill-available;
 }
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -38,20 +36,19 @@ body{
 }
 @media (max-width: 860px){
   .app{ grid-template-columns: 1fr; }
-  .main{ padding-bottom:calc(420px + env(safe-area-inset-bottom)); }
+  .main{ padding-bottom:210px; }
   .summary{
     position:fixed; left:0; right:0; bottom:0; z-index:30;
     display:flex; flex-direction:column;
-    padding:12px 18px calc(18px + env(safe-area-inset-bottom));
-    max-height:82vh;
+    padding:12px 18px 18px;
+    max-height:78vh;
     box-shadow:0 -8px 24px rgba(0,0,0,0.25);
   }
   .summary-title{ display:none; }
-  .summary-details{ order:1; display:none; overflow-y:auto; max-height:40vh; margin-bottom:8px; }
+  .summary-details{ order:1; display:none; overflow-y:auto; max-height:48vh; margin-bottom:8px; }
   .summary.expanded .summary-details{ display:block; }
   .summary-toggle{ display:flex; order:2; }
-  .summary-extra{ order:3; overflow-y:auto; }
-  .summary-total{ order:4; border-top:none; margin-top:6px; padding-top:0; }
+  .summary-total{ order:3; border-top:none; margin-top:6px; padding-top:0; }
   .summary.expanded .summary-toggle-icon{ transform:rotate(180deg); }
 }
 
@@ -154,20 +151,6 @@ body{
   white-space:nowrap;
 }
 .step-count.complete{background:var(--verde-hoja); color:#fff;}
-.step-count-group{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-.limit-plus{
-  border:1.5px dashed var(--borde);
-  background:#fff;
-  color:var(--verde-hoja);
-  font-family:var(--font-ui);
-  font-weight:800;
-  font-size:12.5px;
-  padding:4px 10px;
-  border-radius:20px;
-  cursor:pointer;
-  margin-left:6px;
-}
-.limit-plus:active{transform:scale(0.96);}
 
 .btn-skip{
   display:inline-flex; align-items:center; gap:6px;
@@ -290,55 +273,6 @@ body{
   margin-top:18px;
   padding-top:16px;
 }
-.summary-extra{
-  border-top:1px solid #3A3D34;
-  margin-top:14px;
-  padding-top:14px;
-}
-.extra-label{
-  font-size:12px; font-weight:700; color:#C9CDBE; margin-bottom:8px; margin-top:14px;
-}
-.extra-label:first-child{ margin-top:0; }
-.segmented{ display:flex; gap:8px; }
-.seg-btn{
-  flex:1;
-  background:rgba(255,255,255,0.06);
-  border:1.5px solid rgba(255,255,255,0.12);
-  color:#C9CDBE;
-  font-family:var(--font-ui);
-  font-weight:700;
-  font-size:13.5px;
-  padding:11px 8px;
-  border-radius:10px;
-  cursor:pointer;
-}
-.seg-btn.active{
-  background:var(--verde-claro);
-  border-color:var(--verde-claro);
-  color:var(--carbon);
-}
-.delivery-fields{ margin-top:10px; display:flex; flex-direction:column; gap:8px; }
-.extra-input{
-  width:100%;
-  padding:11px 12px;
-  border-radius:10px;
-  border:1.5px solid rgba(255,255,255,0.15);
-  background:rgba(255,255,255,0.06);
-  color:#fff;
-  font-family:var(--font-ui);
-  font-size:14.5px;
-  outline:none;
-}
-.extra-input::placeholder{ color:#8A8D80; }
-.extra-input:focus{ border-color:var(--verde-claro); }
-.qr-block{ margin-top:10px; text-align:center; }
-.qr-img{ width:150px; height:150px; border-radius:12px; background:#fff; padding:8px; }
-.qr-key{
-  margin-top:8px; font-family:var(--font-ui); font-weight:800; font-size:15px; color:#fff;
-  letter-spacing:0.03em;
-}
-.qr-key span{ color:var(--verde-claro); }
-.qr-hint{ margin-top:4px; font-size:11.5px; color:#8A8D80; }
 .total-row{display:flex; justify-content:space-between; align-items:center; font-size:15px; margin-bottom:4px;}
 .total-amt{font-family:var(--font-display); font-size:26px; font-weight:700;}
 .status-badge{
@@ -395,32 +329,8 @@ body{
   background:var(--verde-hoja); color:#fff; font-size:17px; font-weight:800; cursor:pointer;
   font-family:var(--font-ui);
 }
-.btn-imprimir{
-  width:100%; padding:14px; border-radius:14px; border:1.5px solid var(--borde);
-  background:#fff; color:var(--carbon); font-size:15px; font-weight:800; cursor:pointer;
-  font-family:var(--font-ui); margin-bottom:10px;
-}
 
 .hidden{display:none !important;}
-
-/* COMANDA IMPRIMIBLE */
-#printArea{ display:none; }
-.ticket{
-  width:280px; padding:10px 0; font-family:'Courier New', monospace; color:#000;
-  page-break-after:always;
-}
-.ticket h2{ font-size:16px; text-align:center; margin:0 0 4px; }
-.ticket .ticket-tag{ text-align:center; font-weight:bold; font-size:13px; border:1px solid #000; padding:2px 0; margin-bottom:8px; }
-.ticket .ticket-line{ border-top:1px dashed #000; margin:6px 0; }
-.ticket p{ margin:2px 0; font-size:12.5px; }
-.ticket .ticket-cat{ font-weight:bold; margin-top:6px; }
-.ticket .ticket-total{ font-weight:bold; font-size:14px; margin-top:8px; }
-
-@media print{
-  body *{ visibility:hidden; }
-  #printArea, #printArea *{ visibility:visible; }
-  #printArea{ display:block; position:absolute; top:0; left:0; width:100%; }
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -449,10 +359,7 @@ body{
           <div class="step-title">Paso 1 — Vegetales</div>
           <div class="step-sub">Elige 4</div>
         </div>
-        <div class="step-count-group">
-          <div class="step-count" id="countVeg">0 / 4</div>
-          <button class="limit-plus" id="limitPlusVeg" style="display:none" onclick="increaseLimit('veg')">+1</button>
-        </div>
+        <div class="step-count" id="countVeg">0 / 4</div>
       </div>
       <button class="btn-skip" id="skipBtnVeg" onclick="toggleSkip('veg')">El cliente no quiere más</button>
       <div class="chip-group-label">Vegetales</div>
@@ -470,10 +377,7 @@ body{
           <div class="step-title">Paso 2 — Base</div>
           <div class="step-sub">Elige 1 carbohidrato</div>
         </div>
-        <div class="step-count-group">
-          <div class="step-count" id="countBase">0 / 1</div>
-          <button class="limit-plus" id="limitPlusBase" style="display:none" onclick="increaseLimit('base')">+1</button>
-        </div>
+        <div class="step-count" id="countBase">0 / 1</div>
       </div>
       <div class="chips" id="chipsBase"></div>
     </div>
@@ -485,10 +389,7 @@ body{
           <div class="step-title">Paso 3 — Complementos</div>
           <div class="step-sub">Elige 2</div>
         </div>
-        <div class="step-count-group">
-          <div class="step-count" id="countComp">0 / 2</div>
-          <button class="limit-plus" id="limitPlusComp" style="display:none" onclick="increaseLimit('comp')">+1</button>
-        </div>
+        <div class="step-count" id="countComp">0 / 2</div>
       </div>
       <button class="btn-skip" id="skipBtnComp" onclick="toggleSkip('comp')">El cliente no quiere más</button>
       <div class="chips" id="chipsComp"></div>
@@ -501,10 +402,7 @@ body{
           <div class="step-title">Paso 4 — Proteína</div>
           <div class="step-sub">Elige 1</div>
         </div>
-        <div class="step-count-group">
-          <div class="step-count" id="countProt">0 / 1</div>
-          <button class="limit-plus" id="limitPlusProt" style="display:none" onclick="increaseLimit('prot')">+1</button>
-        </div>
+        <div class="step-count" id="countProt">0 / 1</div>
       </div>
       <div class="chips" id="chipsProt"></div>
     </div>
@@ -516,10 +414,7 @@ body{
           <div class="step-title">Paso 5 — Salsa</div>
           <div class="step-sub">Elige 1</div>
         </div>
-        <div class="step-count-group">
-          <div class="step-count" id="countSalsa">0 / 1</div>
-          <button class="limit-plus" id="limitPlusSalsa" style="display:none" onclick="increaseLimit('salsa')">+1</button>
-        </div>
+        <div class="step-count" id="countSalsa">0 / 1</div>
       </div>
       <div class="chips" id="chipsSalsa"></div>
     </div>
@@ -556,47 +451,6 @@ body{
       </div>
     </div>
 
-    <div class="summary-extra" id="summaryExtra">
-      <div class="extra-label">Tipo de pedido</div>
-      <div class="segmented">
-        <button class="seg-btn active" id="segLocal" onclick="setOrderType('local')">🏠 En local</button>
-        <button class="seg-btn" id="segDomicilio" onclick="setOrderType('domicilio')">🛵 Domicilio</button>
-      </div>
-
-      <div class="delivery-fields hidden" id="deliveryFields">
-        <input type="text" id="deliveryAddress" class="extra-input" placeholder="Dirección de entrega" oninput="state.deliveryAddress=this.value; render();">
-        <input type="tel" id="deliveryPhone" class="extra-input" placeholder="Teléfono de contacto" oninput="state.deliveryPhone=this.value; render();">
-      </div>
-
-      <div class="extra-label">Método de pago</div>
-      <div class="segmented">
-        <button class="seg-btn" id="segEfectivo" onclick="setPaymentMethod('efectivo')">💵 Efectivo</button>
-        <button class="seg-btn" id="segQR" onclick="setPaymentMethod('qr')">📱 QR</button>
-      </div>
-
-      <div class="qr-block hidden" id="qrBlock">
-        <!-- QR de prueba: reemplaza el contenido de este SVG por el QR real del banco/pasarela cuando lo tengas -->
-        <svg id="qrImage" class="qr-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" fill="#fff"/>
-          <g fill="#000">
-            <rect x="6" y="6" width="24" height="24"/><rect x="12" y="12" width="12" height="12" fill="#fff"/>
-            <rect x="70" y="6" width="24" height="24"/><rect x="76" y="12" width="12" height="12" fill="#fff"/>
-            <rect x="6" y="70" width="24" height="24"/><rect x="12" y="76" width="12" height="12" fill="#fff"/>
-            <rect x="36" y="6" width="6" height="6"/><rect x="48" y="6" width="6" height="6"/><rect x="60" y="16" width="6" height="6"/>
-            <rect x="36" y="18" width="6" height="6"/><rect x="44" y="24" width="6" height="6"/><rect x="56" y="30" width="6" height="6"/>
-            <rect x="36" y="36" width="6" height="6"/><rect x="48" y="36" width="6" height="6"/><rect x="60" y="42" width="6" height="6"/>
-            <rect x="70" y="36" width="6" height="6"/><rect x="82" y="42" width="6" height="6"/><rect x="36" y="48" width="6" height="6"/>
-            <rect x="6" y="42" width="6" height="6"/><rect x="18" y="48" width="6" height="6"/><rect x="6" y="54" width="6" height="6"/>
-            <rect x="44" y="60" width="6" height="6"/><rect x="56" y="66" width="6" height="6"/><rect x="70" y="60" width="6" height="6"/>
-            <rect x="82" y="70" width="6" height="6"/><rect x="36" y="78" width="6" height="6"/><rect x="48" y="84" width="6" height="6"/>
-            <rect x="60" y="78" width="6" height="6"/><rect x="72" y="88" width="6" height="6"/><rect x="84" y="82" width="6" height="6"/>
-          </g>
-        </svg>
-        <div class="qr-key">Llave: <span id="qrKeyValue">----</span></div>
-        <div class="qr-hint">El cliente escanea, paga, y envía el comprobante por WhatsApp con esta llave.</div>
-      </div>
-    </div>
-
     <div class="summary-total">
       <div class="status-badge incomplete" id="statusBadge">Falta completar</div>
       <div class="total-row">
@@ -615,12 +469,9 @@ body{
     <div class="confirm-num" id="confirmNum">Bowl #001</div>
     <div class="confirm-summary" id="confirmSummary"></div>
     <div class="confirm-total" id="confirmTotal">Total: $16.000</div>
-    <button class="btn-imprimir" id="btnImprimir">🖨️ Imprimir comanda</button>
     <button class="btn-nuevo" id="btnNuevo">+ NUEVO PEDIDO</button>
   </div>
 </div>
-
-<div id="printArea"></div>
 
 <script>
 // ---------- DATA ----------
@@ -636,70 +487,7 @@ const SALSAS = ["Guacamole","Soya","Aderezo Vital","Miel de Abeja","Spicy Honey"
 
 const PRECIO_BASE = 16000;
 const RECARGO_QUESO_AZUL = 2000;
-const DEFAULT_LIMITS = { veg:4, base:1, comp:2, prot:1, salsa:1 };
-let LIMITS = { ...DEFAULT_LIMITS };
-let extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
-
-const CATEGORY_ITEMS = { veg: VEGETALES, base: BASES, comp: COMPLEMENTOS, prot: PROTEINAS, salsa: SALSAS };
-
-function extraPoolEarned(){
-  let earned = 0;
-  ["veg","comp"].forEach(cat=>{
-    if(skip[cat]) earned += Math.max(0, DEFAULT_LIMITS[cat] - state[cat].length);
-  });
-  return earned;
-}
-
-function extraPoolUsed(){
-  return Object.values(extraUsed).reduce((a,b)=>a+b, 0);
-}
-
-function extraPoolRemaining(){
-  return extraPoolEarned() - extraPoolUsed();
-}
-
-function categoryHoldingExtra(){
-  return Object.keys(extraUsed).find(c => extraUsed[c] > 0) || null;
-}
-
-function canIncreaseLimit(cat){
-  if(extraPoolRemaining() <= 0) return false;
-  const holder = categoryHoldingExtra();
-  if(holder && holder !== cat) return false;
-  if(LIMITS[cat] >= CATEGORY_ITEMS[cat].length) return false;
-  return true;
-}
-
-function increaseLimit(cat){
-  if(!canIncreaseLimit(cat)) return;
-  LIMITS[cat]++;
-  extraUsed[cat]++;
-  render();
-}
-
-function reconcileExtraPool(){
-  let remaining = extraPoolRemaining();
-  if(remaining >= 0) return;
-  const holder = categoryHoldingExtra();
-  if(!holder) return;
-  const reduceBy = Math.min(-remaining, extraUsed[holder]);
-  extraUsed[holder] -= reduceBy;
-  LIMITS[holder] -= reduceBy;
-  if(state[holder].length > LIMITS[holder]){
-    state[holder] = state[holder].slice(0, LIMITS[holder]);
-  }
-}
-
-function renderLimitButtons(){
-  const remaining = extraPoolRemaining();
-  ["veg","base","comp","prot","salsa"].forEach(cat=>{
-    const btn = document.getElementById("limitPlus" + cat.charAt(0).toUpperCase() + cat.slice(1));
-    if(!btn) return;
-    const usable = canIncreaseLimit(cat);
-    btn.style.display = usable ? "inline-flex" : "none";
-    btn.textContent = "+1 (quedan " + remaining + ")";
-  });
-}
+const LIMITS = { veg:4, base:1, comp:2, prot:1, salsa:1 };
 
 // ---------- SUPABASE ----------
 const SUPABASE_URL = "https://vsmmqexrkknfxmvefhvy.supabase.co";
@@ -707,49 +495,13 @@ const SUPABASE_KEY = "sb_publishable_Z35kZsS6DltwhDSpD1UteA_ZQttEyEe";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ---------- STATE ----------
-let state = {
-  veg:[], base:[], comp:[], prot:[], salsa:[],
-  orderType: "local",
-  deliveryAddress: "",
-  deliveryPhone: "",
-  paymentMethod: null,
-  qrKey: null
-};
+let state = { veg:[], base:[], comp:[], prot:[], salsa:[] };
 let skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
 let orderCounter = 1;
-
-function setOrderType(type){
-  state.orderType = type;
-  document.getElementById("segLocal").classList.toggle("active", type === "local");
-  document.getElementById("segDomicilio").classList.toggle("active", type === "domicilio");
-  document.getElementById("deliveryFields").classList.toggle("hidden", type !== "domicilio");
-  render();
-}
-
-function generarLlave(){
-  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  let llave = "";
-  for(let i=0;i<2;i++) llave += letras[Math.floor(Math.random()*letras.length)];
-  llave += "-" + Math.floor(1000 + Math.random()*9000);
-  return llave;
-}
-
-function setPaymentMethod(method){
-  state.paymentMethod = method;
-  document.getElementById("segEfectivo").classList.toggle("active", method === "efectivo");
-  document.getElementById("segQR").classList.toggle("active", method === "qr");
-  document.getElementById("qrBlock").classList.toggle("hidden", method !== "qr");
-  if(method === "qr" && !state.qrKey){
-    state.qrKey = generarLlave();
-    document.getElementById("qrKeyValue").textContent = state.qrKey;
-  }
-  render();
-}
 
 function toggleSkip(cat){
   if(state[cat].length === 0) return; // no se puede saltar sin haber elegido nada
   skip[cat] = !skip[cat];
-  reconcileExtraPool();
   render();
 }
 
@@ -779,7 +531,6 @@ function toggle(cat, item, limit){
     if(arr.length >= limit) return;
     arr.push(item);
   }
-  reconcileExtraPool();
   render();
 }
 
@@ -818,7 +569,6 @@ function renderCounts(){
   setCount("countProt", "prot", LIMITS.prot);
   setCount("countSalsa", "salsa", LIMITS.salsa);
   renderSkipButtons();
-  renderLimitButtons();
 }
 function setCount(id, cat, limit){
   const n = state[cat].length;
@@ -869,18 +619,8 @@ function catOk(cat){
   return state[cat].length === LIMITS[cat] || (skip[cat] && state[cat].length > 0);
 }
 
-function deliveryOk(){
-  if(state.orderType !== "domicilio") return true;
-  return state.deliveryAddress.trim() !== "" && state.deliveryPhone.trim() !== "";
-}
-
-function paymentOk(){
-  return state.paymentMethod === "efectivo" || state.paymentMethod === "qr";
-}
-
 function isComplete(){
-  return catOk("veg") && catOk("base") && catOk("comp") && catOk("prot") && catOk("salsa")
-    && deliveryOk() && paymentOk();
+  return catOk("veg") && catOk("base") && catOk("comp") && catOk("prot") && catOk("salsa");
 }
 
 function renderSummary(){
@@ -914,22 +654,7 @@ function render(){
   renderCounts();
   renderSummary();
   updateSummaryToggleLabel();
-  adjustMainPadding();
 }
-
-function adjustMainPadding(){
-  if(window.innerWidth > 860) return;
-  const summary = document.getElementById("summaryPanel");
-  const main = document.querySelector(".main");
-  const wasExpanded = summary.classList.contains("expanded");
-  if(wasExpanded) summary.classList.remove("expanded");
-  const h = summary.getBoundingClientRect().height;
-  if(wasExpanded) summary.classList.add("expanded");
-  main.style.paddingBottom = (h + 30) + "px";
-}
-
-window.addEventListener("resize", adjustMainPadding);
-window.addEventListener("orientationchange", adjustMainPadding);
 
 function toggleSummaryDetails(){
   document.getElementById("summaryPanel").classList.toggle("expanded");
@@ -983,8 +708,6 @@ function renderMissingBanner(){
   if(state.comp.length < LIMITS.comp && !skip.comp) missing.push((LIMITS.comp-state.comp.length) + " complemento(s)");
   if(state.prot.length < LIMITS.prot && !skip.prot) missing.push((LIMITS.prot-state.prot.length) + " proteína");
   if(state.salsa.length < LIMITS.salsa && !skip.salsa) missing.push((LIMITS.salsa-state.salsa.length) + " salsa");
-  if(!paymentOk()) missing.push("método de pago");
-  if(!deliveryOk()) missing.push("dirección y teléfono de domicilio");
 
   const banner = document.getElementById("missingBanner");
   if(missing.length === 0){
@@ -1000,11 +723,8 @@ document.getElementById("btnOrganizar").onclick = () => {
   const text = document.getElementById("freeTextInput").value;
   if(!text.trim()) return;
   const found = parseFreeText(text);
-  state = { ...found, orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null, qrKey:null };
+  state = found;
   skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
-  LIMITS = { ...DEFAULT_LIMITS };
-  extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
-  resetExtraFieldsUI();
   render();
   renderMissingBanner();
 };
@@ -1032,12 +752,7 @@ document.getElementById("btnConfirmar").onclick = async () => {
     proteina: state.prot[0],
     salsa: state.salsa[0],
     total: total,
-    estado: "pendiente_pago",
-    tipo_pedido: state.orderType,
-    direccion: state.orderType === "domicilio" ? state.deliveryAddress.trim() : null,
-    telefono_cliente: state.orderType === "domicilio" ? state.deliveryPhone.trim() : null,
-    metodo_pago: state.paymentMethod,
-    llave_pago: state.paymentMethod === "qr" ? state.qrKey : null
+    estado: "recibido"
   });
 
   btn.textContent = "CONFIRMAR PEDIDO";
@@ -1050,101 +765,29 @@ document.getElementById("btnConfirmar").onclick = async () => {
   const num = String(orderCounter).padStart(3,"0");
   document.getElementById("confirmNum").textContent = "Bowl #" + num;
 
-  const entregaHTML = state.orderType === "domicilio"
-    ? `<div class="cat-block"><div class="cat-head">🛵 Domicilio</div><ul class="cat-items"><li>✓ ${state.deliveryAddress}</li><li>✓ ${state.deliveryPhone}</li></ul></div>`
-    : `<div class="cat-block"><div class="cat-head">🏠 Tipo de pedido</div><ul class="cat-items"><li>✓ En local</li></ul></div>`;
-  const pagoLabel = state.paymentMethod === "efectivo" ? "Efectivo" : ("QR (llave " + state.qrKey + ")");
-
   const summaryHTML = `
     <div class="cat-block"><div class="cat-head">🥬 Vegetales</div><ul class="cat-items">${state.veg.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
     <div class="cat-block"><div class="cat-head">🍚 Base</div><ul class="cat-items">${state.base.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
     <div class="cat-block"><div class="cat-head">➕ Complementos</div><ul class="cat-items">${state.comp.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
     <div class="cat-block"><div class="cat-head">🍗 Proteína</div><ul class="cat-items">${state.prot.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
     <div class="cat-block"><div class="cat-head">🥑 Salsa</div><ul class="cat-items">${state.salsa.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
-    ${entregaHTML}
-    <div class="cat-block"><div class="cat-head">💳 Pago</div><ul class="cat-items"><li>✓ ${pagoLabel}</li></ul></div>
   `;
   document.getElementById("confirmSummary").innerHTML = summaryHTML;
   document.getElementById("confirmTotal").textContent = "Total: " + fmt(total);
 
   document.getElementById("confirmScreen").classList.remove("hidden");
   document.getElementById("summaryPanel").classList.remove("expanded");
-  window._lastOrder = {
-    num, total, pagoLabel,
-    veg: [...state.veg], base: [...state.base], comp: [...state.comp],
-    prot: [...state.prot], salsa: [...state.salsa],
-    orderType: state.orderType,
-    deliveryAddress: state.deliveryAddress,
-    deliveryPhone: state.deliveryPhone,
-    paymentMethod: state.paymentMethod,
-    qrKey: state.qrKey
-  };
-  document.getElementById("btnWhatsapp").classList.toggle("hidden", state.paymentMethod !== "qr");
-};
-
-document.getElementById("btnImprimir").onclick = () => {
-  const o = window._lastOrder;
-  if(!o) return;
-
-  const entregaLine = o.orderType === "domicilio"
-    ? `<p><b>DOMICILIO</b></p><p>${o.deliveryAddress}</p><p>Tel: ${o.deliveryPhone}</p>`
-    : `<p><b>EN LOCAL</b></p>`;
-
-  function ticket(tag){
-    return `
-      <div class="ticket">
-        <div class="ticket-tag">${tag}</div>
-        <h2>avito Bowls</h2>
-        <p style="text-align:center;">Bowl #${o.num}</p>
-        <p style="text-align:center;">${new Date().toLocaleString("es-CO")}</p>
-        <div class="ticket-line"></div>
-        ${entregaLine}
-        <div class="ticket-line"></div>
-        <p class="ticket-cat">VEGETALES</p>
-        ${o.veg.map(v=>`<p>- ${v}</p>`).join("")}
-        <p class="ticket-cat">BASE</p>
-        ${o.base.map(v=>`<p>- ${v}</p>`).join("")}
-        <p class="ticket-cat">COMPLEMENTOS</p>
-        ${o.comp.map(v=>`<p>- ${v}</p>`).join("")}
-        <p class="ticket-cat">PROTEÍNA</p>
-        ${o.prot.map(v=>`<p>- ${v}</p>`).join("")}
-        <p class="ticket-cat">SALSA</p>
-        ${o.salsa.map(v=>`<p>- ${v}</p>`).join("")}
-        <div class="ticket-line"></div>
-        <p>Pago: ${o.pagoLabel}</p>
-        <p class="ticket-total">TOTAL: ${fmt(o.total)}</p>
-      </div>
-    `;
-  }
-
-  document.getElementById("printArea").innerHTML = ticket("COCINA") + ticket("CLIENTE");
-  window.print();
 };
 
 document.getElementById("btnNuevo").onclick = () => {
   orderCounter++;
   document.getElementById("orderNumLabel").textContent = "Pedido #" + String(orderCounter).padStart(3,"0");
-  state = { veg:[], base:[], comp:[], prot:[], salsa:[], orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null, qrKey:null };
+  state = { veg:[], base:[], comp:[], prot:[], salsa:[] };
   skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
-  LIMITS = { ...DEFAULT_LIMITS };
-  extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
-  resetExtraFieldsUI();
   document.getElementById("freeTextInput").value = "";
   document.getElementById("confirmScreen").classList.add("hidden");
   render();
 };
-
-function resetExtraFieldsUI(){
-  document.getElementById("segLocal").classList.add("active");
-  document.getElementById("segDomicilio").classList.remove("active");
-  document.getElementById("deliveryFields").classList.add("hidden");
-  document.getElementById("deliveryAddress").value = "";
-  document.getElementById("deliveryPhone").value = "";
-  document.getElementById("segEfectivo").classList.remove("active");
-  document.getElementById("segQR").classList.remove("active");
-  document.getElementById("qrBlock").classList.add("hidden");
-  document.getElementById("qrKeyValue").textContent = "----";
-}
 
 // ---------- INIT ----------
 render();
