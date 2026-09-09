@@ -414,25 +414,6 @@ body{
 }
 
 .hidden{display:none !important;}
-
-/* COMANDA IMPRIMIBLE */
-#printArea{ display:none; }
-.ticket{
-  width:280px; padding:10px 0; font-family:'Courier New', monospace; color:#000;
-  page-break-after:always;
-}
-.ticket h2{ font-size:16px; text-align:center; margin:0 0 4px; }
-.ticket .ticket-tag{ text-align:center; font-weight:bold; font-size:13px; border:1px solid #000; padding:2px 0; margin-bottom:8px; }
-.ticket .ticket-line{ border-top:1px dashed #000; margin:6px 0; }
-.ticket p{ margin:2px 0; font-size:12.5px; }
-.ticket .ticket-cat{ font-weight:bold; margin-top:6px; }
-.ticket .ticket-total{ font-weight:bold; font-size:14px; margin-top:8px; }
-
-@media print{
-  body *{ visibility:hidden; }
-  #printArea, #printArea *{ visibility:visible; }
-  #printArea{ display:block; position:absolute; top:0; left:0; width:100%; }
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -622,13 +603,10 @@ body{
     <div class="confirm-num" id="confirmNum">Bowl #001</div>
     <div class="confirm-summary" id="confirmSummary"></div>
     <div class="confirm-total" id="confirmTotal">Total: $16.000</div>
-    <button class="btn-imprimir" id="btnImprimir">🖨️ Imprimir comanda</button>
     <button class="btn-whatsapp hidden" id="btnWhatsapp">📲 Enviar comprobante por WhatsApp</button>
     <button class="btn-nuevo" id="btnNuevo">+ NUEVO PEDIDO</button>
   </div>
 </div>
-
-<div id="printArea"></div>
 
 <script>
 // ---------- DATA ----------
@@ -1079,50 +1057,6 @@ document.getElementById("btnConfirmar").onclick = async () => {
     doubled: [...doubled]
   };
   document.getElementById("btnWhatsapp").classList.toggle("hidden", state.paymentMethod !== "qr");
-};
-
-document.getElementById("btnImprimir").onclick = () => {
-  const o = window._lastOrder;
-  if(!o) return;
-
-  const entregaLine = o.orderType === "domicilio"
-    ? `<p><b>DOMICILIO</b></p><p>${o.deliveryAddress}</p><p>Tel: ${o.deliveryPhone}</p>`
-    : `<p><b>EN LOCAL</b></p>`;
-
-  function tag(cat, item){
-    const d = (o.doubled || []).some(x => x.cat === cat && x.item === item);
-    return d ? " (x2)" : "";
-  }
-
-  function ticket(tag_){
-    return `
-      <div class="ticket">
-        <div class="ticket-tag">${tag_}</div>
-        <h2>avito Bowls</h2>
-        <p style="text-align:center;">Bowl #${o.num}</p>
-        <p style="text-align:center;">${new Date().toLocaleString("es-CO")}</p>
-        <div class="ticket-line"></div>
-        ${entregaLine}
-        <div class="ticket-line"></div>
-        <p class="ticket-cat">VEGETALES</p>
-        ${o.veg.map(v=>`<p>- ${v}${tag("veg",v)}</p>`).join("")}
-        <p class="ticket-cat">BASE</p>
-        ${o.base.map(v=>`<p>- ${v}${tag("base",v)}</p>`).join("")}
-        <p class="ticket-cat">COMPLEMENTOS</p>
-        ${o.comp.map(v=>`<p>- ${v}${tag("comp",v)}</p>`).join("")}
-        <p class="ticket-cat">PROTEÍNA</p>
-        ${o.prot.map(v=>`<p>- ${v}${tag("prot",v)}</p>`).join("")}
-        <p class="ticket-cat">SALSA</p>
-        ${o.salsa.map(v=>`<p>- ${v}${tag("salsa",v)}</p>`).join("")}
-        <div class="ticket-line"></div>
-        <p>Pago: ${o.pagoLabel}</p>
-        <p class="ticket-total">TOTAL: ${fmt(o.total)}</p>
-      </div>
-    `;
-  }
-
-  document.getElementById("printArea").innerHTML = ticket("COCINA") + ticket("CLIENTE");
-  window.print();
 };
 
 // TODO: reemplaza este número por el WhatsApp real del restaurante (formato: código país + número, sin +, sin espacios)

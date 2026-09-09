@@ -98,6 +98,28 @@ body{
 .btn-prep{ background:var(--azul); color:#fff; }
 .btn-listo{ background:var(--verde-hoja); color:#fff; }
 .btn-listo.secondary{ background:var(--crema-osc); color:var(--carbon); }
+.btn-print{ background:var(--carbon); color:#fff; flex:0 0 44px; padding:11px 0; }
+
+.hidden{ display:none !important; }
+
+/* COMANDA IMPRIMIBLE */
+#printArea{ display:none; }
+.ticket{
+  width:280px; padding:10px 0; font-family:'Courier New', monospace; color:#000;
+  page-break-after:always;
+}
+.ticket h2{ font-size:16px; text-align:center; margin:0 0 4px; }
+.ticket .ticket-tag{ text-align:center; font-weight:bold; font-size:13px; border:1px solid #000; padding:2px 0; margin-bottom:8px; }
+.ticket .ticket-line{ border-top:1px dashed #000; margin:6px 0; }
+.ticket p{ margin:2px 0; font-size:12.5px; }
+.ticket .ticket-cat{ font-weight:bold; margin-top:6px; }
+.ticket .ticket-total{ font-weight:bold; font-size:14px; margin-top:8px; }
+
+@media print{
+  body *{ visibility:hidden; }
+  #printArea, #printArea *{ visibility:visible; }
+  #printArea{ display:block; position:absolute; top:0; left:0; width:100%; }
+}
 
 /* LOGIN */
 .login-screen{
@@ -121,7 +143,6 @@ body{
   width:100%; padding:14px; border-radius:12px; border:none; background:var(--verde-hoja); color:#fff;
   font-size:15.5px; font-weight:800; cursor:pointer; font-family:var(--font-ui);
 }
-.hidden{ display:none !important; }
 </style>
 </head>
 <body>
@@ -160,6 +181,8 @@ body{
 
 <div class="board" id="board"></div>
 </div>
+
+<div id="printArea"></div>
 
 <script>
 const ADMIN_USER = "admin";
@@ -251,6 +274,7 @@ function render(){
         ${p.estado === "recibido" ? `<button class="btn-action btn-prep" onclick="updateEstado(${p.id}, 'en_preparacion')">Empezar</button>` : ""}
         ${p.estado === "en_preparacion" ? `<button class="btn-action btn-listo" onclick="updateEstado(${p.id}, 'listo')">Marcar listo</button>` : ""}
         ${p.estado === "recibido" ? `<button class="btn-action btn-listo secondary" onclick="updateEstado(${p.id}, 'listo')">Listo</button>` : ""}
+        ${p.estado !== "pendiente_pago" ? `<button class="btn-action btn-print" onclick="imprimirComanda(${p.id})" title="Imprimir comanda">🖨️</button>` : ""}
       </div>
     </div>
   `).join("");
@@ -262,6 +286,51 @@ async function updateEstado(id, nuevoEstado){
   const p = pedidos.find(x => x.id === id);
   if(p) p.estado = nuevoEstado;
   render();
+}
+
+function imprimirComanda(id){
+  const p = pedidos.find(x => x.id === id);
+  if(!p) return;
+
+  const entregaLine = p.tipo_pedido === "domicilio"
+    ? `<p><b>DOMICILIO</b></p><p>${p.direccion || ""}</p><p>Tel: ${p.telefono_cliente || ""}</p>`
+    : `<p><b>EN LOCAL</b></p>`;
+
+  const dobles = p.dobles || [];
+  function tag(cat, item){
+    return dobles.some(x => x.cat === cat && x.item === item) ? " (x2)" : "";
+  }
+  const pagoLabel = metodoPagoLabel(p.metodo_pago) + (p.metodo_pago === "qr" && p.llave_pago ? ` (Llave: ${p.llave_pago})` : "");
+
+  function ticket(tag_){
+    return `
+      <div class="ticket">
+        <div class="ticket-tag">${tag_}</div>
+        <h2>avito Bowls</h2>
+        <p style="text-align:center;">Bowl #${String(p.numero_pedido).padStart(3,"0")}</p>
+        <p style="text-align:center;">${new Date(p.created_at).toLocaleString("es-CO")}</p>
+        <div class="ticket-line"></div>
+        ${entregaLine}
+        <div class="ticket-line"></div>
+        <p class="ticket-cat">VEGETALES</p>
+        ${p.vegetales.map(v=>`<p>- ${v}${tag("veg",v)}</p>`).join("")}
+        <p class="ticket-cat">BASE</p>
+        <p>- ${p.base}${tag("base",p.base)}</p>
+        <p class="ticket-cat">COMPLEMENTOS</p>
+        ${p.complementos.map(v=>`<p>- ${v}${tag("comp",v)}</p>`).join("")}
+        <p class="ticket-cat">PROTEÍNA</p>
+        <p>- ${p.proteina}${tag("prot",p.proteina)}</p>
+        <p class="ticket-cat">SALSA</p>
+        <p>- ${p.salsa}${tag("salsa",p.salsa)}</p>
+        <div class="ticket-line"></div>
+        <p>Pago: ${pagoLabel}</p>
+        <p class="ticket-total">TOTAL: ${fmt(p.total)}</p>
+      </div>
+    `;
+  }
+
+  document.getElementById("printArea").innerHTML = ticket("COCINA") + ticket("CLIENTE");
+  window.print();
 }
 
 async function loadPedidos(){
