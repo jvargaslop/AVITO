@@ -67,6 +67,7 @@ body{
 .card.recibido{ border-left-color: var(--alerta); }
 .card.en_preparacion{ border-left-color: var(--azul); }
 .card.listo{ border-left-color: var(--verde-claro); opacity:0.75; }
+.card.pendiente_pago{ border-left-color:#B8860B; }
 
 .card-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
 .card-num{ font-family:var(--font-display); font-weight:700; font-size:20px; }
@@ -79,6 +80,8 @@ body{
 .card-status.recibido{ background:#FBEAE0; color:var(--alerta); }
 .card-status.en_preparacion{ background:#E4EEF4; color:var(--azul); }
 .card-status.listo{ background:#EAF1DE; color:var(--verde-hoja); }
+.card-status.pendiente_pago{ background:#FCEFD2; color:#B8860B; }
+.btn-pago{ background:#B8860B; color:#fff; }
 
 .card-block{ margin-bottom:8px; font-size:14px; }
 .card-block b{ color:var(--gris); font-weight:700; font-size:12px; display:block; margin-bottom:2px; text-transform:none; }
@@ -147,7 +150,8 @@ body{
 </div>
 
 <div class="tabs">
-  <div class="tab active" data-filter="activos">Activos</div>
+  <div class="tab active" data-filter="pendiente_pago">💳 Pago pendiente</div>
+  <div class="tab" data-filter="activos">Activos</div>
   <div class="tab" data-filter="recibido">Recibidos</div>
   <div class="tab" data-filter="en_preparacion">En preparación</div>
   <div class="tab" data-filter="listo">Listos</div>
@@ -187,7 +191,7 @@ const SUPABASE_KEY = "sb_publishable_Z35kZsS6DltwhDSpD1UteA_ZQttEyEe";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let pedidos = [];
-let filtro = "activos";
+let filtro = "pendiente_pago";
 
 function timeAgo(iso){
   const diff = Math.floor((Date.now() - new Date(iso).getTime())/60000);
@@ -197,7 +201,11 @@ function timeAgo(iso){
 }
 
 function statusLabel(s){
-  return { recibido:"Recibido", en_preparacion:"En preparación", listo:"Listo" }[s] || s;
+  return { pendiente_pago:"Pago pendiente", recibido:"Recibido", en_preparacion:"En preparación", listo:"Listo" }[s] || s;
+}
+
+function metodoPagoLabel(m){
+  return m === "efectivo" ? "💵 Efectivo" : m === "tarjeta" ? "💳 Tarjeta" : "—";
 }
 
 function fmt(n){ return "$" + n.toLocaleString("es-CO"); }
@@ -206,7 +214,7 @@ function render(){
   const board = document.getElementById("board");
   let list = pedidos.slice().sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
 
-  if(filtro === "activos") list = list.filter(p => p.estado !== "listo");
+  if(filtro === "activos") list = list.filter(p => p.estado === "recibido" || p.estado === "en_preparacion");
   else if(filtro !== "todos") list = list.filter(p => p.estado === filtro);
 
   if(list.length === 0){
@@ -222,6 +230,9 @@ function render(){
       </div>
       <div class="card-status ${p.estado}">${statusLabel(p.estado)}</div>
 
+      ${p.tipo_pedido === "domicilio" ? `<div class="card-block"><b>🛵 Domicilio</b>${p.direccion || ""} · ${p.telefono_cliente || ""}</div>` : `<div class="card-block"><b>🏠 Tipo</b>En local</div>`}
+      <div class="card-block"><b>Pago</b>${metodoPagoLabel(p.metodo_pago)}</div>
+
       <div class="card-block"><b>Vegetales</b>${p.vegetales.join(", ")}</div>
       <div class="card-block"><b>Base</b>${p.base}</div>
       <div class="card-block"><b>Complementos</b>${p.complementos.join(", ")}</div>
@@ -231,6 +242,7 @@ function render(){
       <div class="card-total"><span>Total</span><span>${fmt(p.total)}</span></div>
 
       <div class="card-actions">
+        ${p.estado === "pendiente_pago" ? `<button class="btn-action btn-pago" onclick="updateEstado(${p.id}, 'recibido')">✓ Confirmar pago</button>` : ""}
         ${p.estado === "recibido" ? `<button class="btn-action btn-prep" onclick="updateEstado(${p.id}, 'en_preparacion')">Empezar</button>` : ""}
         ${p.estado === "en_preparacion" ? `<button class="btn-action btn-listo" onclick="updateEstado(${p.id}, 'listo')">Marcar listo</button>` : ""}
         ${p.estado === "recibido" ? `<button class="btn-action btn-listo secondary" onclick="updateEstado(${p.id}, 'listo')">Listo</button>` : ""}
