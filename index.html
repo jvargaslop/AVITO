@@ -38,7 +38,7 @@ body{
 }
 @media (max-width: 860px){
   .app{ grid-template-columns: 1fr; }
-  .main{ padding-bottom:calc(260px + env(safe-area-inset-bottom)); }
+  .main{ padding-bottom:calc(420px + env(safe-area-inset-bottom)); }
   .summary{
     position:fixed; left:0; right:0; bottom:0; z-index:30;
     display:flex; flex-direction:column;
@@ -331,6 +331,14 @@ body{
 }
 .extra-input::placeholder{ color:#8A8D80; }
 .extra-input:focus{ border-color:var(--verde-claro); }
+.qr-block{ margin-top:10px; text-align:center; }
+.qr-img{ width:150px; height:150px; border-radius:12px; background:#fff; padding:8px; }
+.qr-key{
+  margin-top:8px; font-family:var(--font-ui); font-weight:800; font-size:15px; color:#fff;
+  letter-spacing:0.03em;
+}
+.qr-key span{ color:var(--verde-claro); }
+.qr-hint{ margin-top:4px; font-size:11.5px; color:#8A8D80; }
 .total-row{display:flex; justify-content:space-between; align-items:center; font-size:15px; margin-bottom:4px;}
 .total-amt{font-family:var(--font-display); font-size:26px; font-weight:700;}
 .status-badge{
@@ -443,7 +451,7 @@ body{
         </div>
         <div class="step-count-group">
           <div class="step-count" id="countVeg">0 / 4</div>
-          <button class="limit-plus" onclick="increaseLimit('veg')">+1 vegetal</button>
+          <button class="limit-plus" id="limitPlusVeg" style="display:none" onclick="increaseLimit('veg')">+1</button>
         </div>
       </div>
       <button class="btn-skip" id="skipBtnVeg" onclick="toggleSkip('veg')">El cliente no quiere más</button>
@@ -462,7 +470,10 @@ body{
           <div class="step-title">Paso 2 — Base</div>
           <div class="step-sub">Elige 1 carbohidrato</div>
         </div>
-        <div class="step-count" id="countBase">0 / 1</div>
+        <div class="step-count-group">
+          <div class="step-count" id="countBase">0 / 1</div>
+          <button class="limit-plus" id="limitPlusBase" style="display:none" onclick="increaseLimit('base')">+1</button>
+        </div>
       </div>
       <div class="chips" id="chipsBase"></div>
     </div>
@@ -476,7 +487,7 @@ body{
         </div>
         <div class="step-count-group">
           <div class="step-count" id="countComp">0 / 2</div>
-          <button class="limit-plus" onclick="increaseLimit('comp')">+1 complemento</button>
+          <button class="limit-plus" id="limitPlusComp" style="display:none" onclick="increaseLimit('comp')">+1</button>
         </div>
       </div>
       <button class="btn-skip" id="skipBtnComp" onclick="toggleSkip('comp')">El cliente no quiere más</button>
@@ -490,7 +501,10 @@ body{
           <div class="step-title">Paso 4 — Proteína</div>
           <div class="step-sub">Elige 1</div>
         </div>
-        <div class="step-count" id="countProt">0 / 1</div>
+        <div class="step-count-group">
+          <div class="step-count" id="countProt">0 / 1</div>
+          <button class="limit-plus" id="limitPlusProt" style="display:none" onclick="increaseLimit('prot')">+1</button>
+        </div>
       </div>
       <div class="chips" id="chipsProt"></div>
     </div>
@@ -502,7 +516,10 @@ body{
           <div class="step-title">Paso 5 — Salsa</div>
           <div class="step-sub">Elige 1</div>
         </div>
-        <div class="step-count" id="countSalsa">0 / 1</div>
+        <div class="step-count-group">
+          <div class="step-count" id="countSalsa">0 / 1</div>
+          <button class="limit-plus" id="limitPlusSalsa" style="display:none" onclick="increaseLimit('salsa')">+1</button>
+        </div>
       </div>
       <div class="chips" id="chipsSalsa"></div>
     </div>
@@ -554,7 +571,29 @@ body{
       <div class="extra-label">Método de pago</div>
       <div class="segmented">
         <button class="seg-btn" id="segEfectivo" onclick="setPaymentMethod('efectivo')">💵 Efectivo</button>
-        <button class="seg-btn" id="segTarjeta" onclick="setPaymentMethod('tarjeta')">💳 Tarjeta</button>
+        <button class="seg-btn" id="segQR" onclick="setPaymentMethod('qr')">📱 QR</button>
+      </div>
+
+      <div class="qr-block hidden" id="qrBlock">
+        <!-- QR de prueba: reemplaza el contenido de este SVG por el QR real del banco/pasarela cuando lo tengas -->
+        <svg id="qrImage" class="qr-img" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" fill="#fff"/>
+          <g fill="#000">
+            <rect x="6" y="6" width="24" height="24"/><rect x="12" y="12" width="12" height="12" fill="#fff"/>
+            <rect x="70" y="6" width="24" height="24"/><rect x="76" y="12" width="12" height="12" fill="#fff"/>
+            <rect x="6" y="70" width="24" height="24"/><rect x="12" y="76" width="12" height="12" fill="#fff"/>
+            <rect x="36" y="6" width="6" height="6"/><rect x="48" y="6" width="6" height="6"/><rect x="60" y="16" width="6" height="6"/>
+            <rect x="36" y="18" width="6" height="6"/><rect x="44" y="24" width="6" height="6"/><rect x="56" y="30" width="6" height="6"/>
+            <rect x="36" y="36" width="6" height="6"/><rect x="48" y="36" width="6" height="6"/><rect x="60" y="42" width="6" height="6"/>
+            <rect x="70" y="36" width="6" height="6"/><rect x="82" y="42" width="6" height="6"/><rect x="36" y="48" width="6" height="6"/>
+            <rect x="6" y="42" width="6" height="6"/><rect x="18" y="48" width="6" height="6"/><rect x="6" y="54" width="6" height="6"/>
+            <rect x="44" y="60" width="6" height="6"/><rect x="56" y="66" width="6" height="6"/><rect x="70" y="60" width="6" height="6"/>
+            <rect x="82" y="70" width="6" height="6"/><rect x="36" y="78" width="6" height="6"/><rect x="48" y="84" width="6" height="6"/>
+            <rect x="60" y="78" width="6" height="6"/><rect x="72" y="88" width="6" height="6"/><rect x="84" y="82" width="6" height="6"/>
+          </g>
+        </svg>
+        <div class="qr-key">Llave: <span id="qrKeyValue">----</span></div>
+        <div class="qr-hint">El cliente escanea, paga, y envía el comprobante por WhatsApp con esta llave.</div>
       </div>
     </div>
 
@@ -599,13 +638,67 @@ const PRECIO_BASE = 16000;
 const RECARGO_QUESO_AZUL = 2000;
 const DEFAULT_LIMITS = { veg:4, base:1, comp:2, prot:1, salsa:1 };
 let LIMITS = { ...DEFAULT_LIMITS };
-const LIMITS_CAP = { veg:8, comp:5 };
+let extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
+
+const CATEGORY_ITEMS = { veg: VEGETALES, base: BASES, comp: COMPLEMENTOS, prot: PROTEINAS, salsa: SALSAS };
+
+function extraPoolEarned(){
+  let earned = 0;
+  ["veg","comp"].forEach(cat=>{
+    if(skip[cat]) earned += Math.max(0, DEFAULT_LIMITS[cat] - state[cat].length);
+  });
+  return earned;
+}
+
+function extraPoolUsed(){
+  return Object.values(extraUsed).reduce((a,b)=>a+b, 0);
+}
+
+function extraPoolRemaining(){
+  return extraPoolEarned() - extraPoolUsed();
+}
+
+function categoryHoldingExtra(){
+  return Object.keys(extraUsed).find(c => extraUsed[c] > 0) || null;
+}
+
+function canIncreaseLimit(cat){
+  if(extraPoolRemaining() <= 0) return false;
+  const holder = categoryHoldingExtra();
+  if(holder && holder !== cat) return false;
+  if(LIMITS[cat] >= CATEGORY_ITEMS[cat].length) return false;
+  return true;
+}
 
 function increaseLimit(cat){
-  const cap = LIMITS_CAP[cat] || (LIMITS[cat] + 1);
-  if(LIMITS[cat] >= cap) return;
+  if(!canIncreaseLimit(cat)) return;
   LIMITS[cat]++;
+  extraUsed[cat]++;
   render();
+}
+
+function reconcileExtraPool(){
+  let remaining = extraPoolRemaining();
+  if(remaining >= 0) return;
+  const holder = categoryHoldingExtra();
+  if(!holder) return;
+  const reduceBy = Math.min(-remaining, extraUsed[holder]);
+  extraUsed[holder] -= reduceBy;
+  LIMITS[holder] -= reduceBy;
+  if(state[holder].length > LIMITS[holder]){
+    state[holder] = state[holder].slice(0, LIMITS[holder]);
+  }
+}
+
+function renderLimitButtons(){
+  const remaining = extraPoolRemaining();
+  ["veg","base","comp","prot","salsa"].forEach(cat=>{
+    const btn = document.getElementById("limitPlus" + cat.charAt(0).toUpperCase() + cat.slice(1));
+    if(!btn) return;
+    const usable = canIncreaseLimit(cat);
+    btn.style.display = usable ? "inline-flex" : "none";
+    btn.textContent = "+1 (quedan " + remaining + ")";
+  });
 }
 
 // ---------- SUPABASE ----------
@@ -619,7 +712,8 @@ let state = {
   orderType: "local",
   deliveryAddress: "",
   deliveryPhone: "",
-  paymentMethod: null
+  paymentMethod: null,
+  qrKey: null
 };
 let skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
 let orderCounter = 1;
@@ -632,16 +726,30 @@ function setOrderType(type){
   render();
 }
 
+function generarLlave(){
+  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let llave = "";
+  for(let i=0;i<2;i++) llave += letras[Math.floor(Math.random()*letras.length)];
+  llave += "-" + Math.floor(1000 + Math.random()*9000);
+  return llave;
+}
+
 function setPaymentMethod(method){
   state.paymentMethod = method;
   document.getElementById("segEfectivo").classList.toggle("active", method === "efectivo");
-  document.getElementById("segTarjeta").classList.toggle("active", method === "tarjeta");
+  document.getElementById("segQR").classList.toggle("active", method === "qr");
+  document.getElementById("qrBlock").classList.toggle("hidden", method !== "qr");
+  if(method === "qr" && !state.qrKey){
+    state.qrKey = generarLlave();
+    document.getElementById("qrKeyValue").textContent = state.qrKey;
+  }
   render();
 }
 
 function toggleSkip(cat){
   if(state[cat].length === 0) return; // no se puede saltar sin haber elegido nada
   skip[cat] = !skip[cat];
+  reconcileExtraPool();
   render();
 }
 
@@ -671,6 +779,7 @@ function toggle(cat, item, limit){
     if(arr.length >= limit) return;
     arr.push(item);
   }
+  reconcileExtraPool();
   render();
 }
 
@@ -709,6 +818,7 @@ function renderCounts(){
   setCount("countProt", "prot", LIMITS.prot);
   setCount("countSalsa", "salsa", LIMITS.salsa);
   renderSkipButtons();
+  renderLimitButtons();
 }
 function setCount(id, cat, limit){
   const n = state[cat].length;
@@ -765,7 +875,7 @@ function deliveryOk(){
 }
 
 function paymentOk(){
-  return state.paymentMethod === "efectivo" || state.paymentMethod === "tarjeta";
+  return state.paymentMethod === "efectivo" || state.paymentMethod === "qr";
 }
 
 function isComplete(){
@@ -804,7 +914,22 @@ function render(){
   renderCounts();
   renderSummary();
   updateSummaryToggleLabel();
+  adjustMainPadding();
 }
+
+function adjustMainPadding(){
+  if(window.innerWidth > 860) return;
+  const summary = document.getElementById("summaryPanel");
+  const main = document.querySelector(".main");
+  const wasExpanded = summary.classList.contains("expanded");
+  if(wasExpanded) summary.classList.remove("expanded");
+  const h = summary.getBoundingClientRect().height;
+  if(wasExpanded) summary.classList.add("expanded");
+  main.style.paddingBottom = (h + 30) + "px";
+}
+
+window.addEventListener("resize", adjustMainPadding);
+window.addEventListener("orientationchange", adjustMainPadding);
 
 function toggleSummaryDetails(){
   document.getElementById("summaryPanel").classList.toggle("expanded");
@@ -875,9 +1000,10 @@ document.getElementById("btnOrganizar").onclick = () => {
   const text = document.getElementById("freeTextInput").value;
   if(!text.trim()) return;
   const found = parseFreeText(text);
-  state = { ...found, orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null };
+  state = { ...found, orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null, qrKey:null };
   skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
   LIMITS = { ...DEFAULT_LIMITS };
+  extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
   resetExtraFieldsUI();
   render();
   renderMissingBanner();
@@ -910,7 +1036,8 @@ document.getElementById("btnConfirmar").onclick = async () => {
     tipo_pedido: state.orderType,
     direccion: state.orderType === "domicilio" ? state.deliveryAddress.trim() : null,
     telefono_cliente: state.orderType === "domicilio" ? state.deliveryPhone.trim() : null,
-    metodo_pago: state.paymentMethod
+    metodo_pago: state.paymentMethod,
+    llave_pago: state.paymentMethod === "qr" ? state.qrKey : null
   });
 
   btn.textContent = "CONFIRMAR PEDIDO";
@@ -926,7 +1053,7 @@ document.getElementById("btnConfirmar").onclick = async () => {
   const entregaHTML = state.orderType === "domicilio"
     ? `<div class="cat-block"><div class="cat-head">🛵 Domicilio</div><ul class="cat-items"><li>✓ ${state.deliveryAddress}</li><li>✓ ${state.deliveryPhone}</li></ul></div>`
     : `<div class="cat-block"><div class="cat-head">🏠 Tipo de pedido</div><ul class="cat-items"><li>✓ En local</li></ul></div>`;
-  const pagoLabel = state.paymentMethod === "efectivo" ? "Efectivo" : "Tarjeta";
+  const pagoLabel = state.paymentMethod === "efectivo" ? "Efectivo" : ("QR (llave " + state.qrKey + ")");
 
   const summaryHTML = `
     <div class="cat-block"><div class="cat-head">🥬 Vegetales</div><ul class="cat-items">${state.veg.map(v=>'<li>✓ '+v+'</li>').join("")}</ul></div>
@@ -948,8 +1075,11 @@ document.getElementById("btnConfirmar").onclick = async () => {
     prot: [...state.prot], salsa: [...state.salsa],
     orderType: state.orderType,
     deliveryAddress: state.deliveryAddress,
-    deliveryPhone: state.deliveryPhone
+    deliveryPhone: state.deliveryPhone,
+    paymentMethod: state.paymentMethod,
+    qrKey: state.qrKey
   };
+  document.getElementById("btnWhatsapp").classList.toggle("hidden", state.paymentMethod !== "qr");
 };
 
 document.getElementById("btnImprimir").onclick = () => {
@@ -994,9 +1124,10 @@ document.getElementById("btnImprimir").onclick = () => {
 document.getElementById("btnNuevo").onclick = () => {
   orderCounter++;
   document.getElementById("orderNumLabel").textContent = "Pedido #" + String(orderCounter).padStart(3,"0");
-  state = { veg:[], base:[], comp:[], prot:[], salsa:[], orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null };
+  state = { veg:[], base:[], comp:[], prot:[], salsa:[], orderType:"local", deliveryAddress:"", deliveryPhone:"", paymentMethod:null, qrKey:null };
   skip = { veg:false, base:false, comp:false, prot:false, salsa:false };
   LIMITS = { ...DEFAULT_LIMITS };
+  extraUsed = { veg:0, base:0, comp:0, prot:0, salsa:0 };
   resetExtraFieldsUI();
   document.getElementById("freeTextInput").value = "";
   document.getElementById("confirmScreen").classList.add("hidden");
@@ -1010,7 +1141,9 @@ function resetExtraFieldsUI(){
   document.getElementById("deliveryAddress").value = "";
   document.getElementById("deliveryPhone").value = "";
   document.getElementById("segEfectivo").classList.remove("active");
-  document.getElementById("segTarjeta").classList.remove("active");
+  document.getElementById("segQR").classList.remove("active");
+  document.getElementById("qrBlock").classList.add("hidden");
+  document.getElementById("qrKeyValue").textContent = "----";
 }
 
 // ---------- INIT ----------
