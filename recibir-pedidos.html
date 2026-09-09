@@ -205,7 +205,12 @@ function statusLabel(s){
 }
 
 function metodoPagoLabel(m){
-  return m === "efectivo" ? "💵 Efectivo" : m === "tarjeta" ? "💳 Tarjeta" : "—";
+  return m === "efectivo" ? "💵 Efectivo" : m === "qr" ? "📱 QR" : "—";
+}
+
+function itemsConDobles(lista, cat, dobles){
+  const d = dobles || [];
+  return lista.map(item => item + (d.some(x=>x.cat===cat && x.item===item) ? " (x2)" : "")).join(", ");
 }
 
 function fmt(n){ return "$" + n.toLocaleString("es-CO"); }
@@ -231,13 +236,13 @@ function render(){
       <div class="card-status ${p.estado}">${statusLabel(p.estado)}</div>
 
       ${p.tipo_pedido === "domicilio" ? `<div class="card-block"><b>🛵 Domicilio</b>${p.direccion || ""} · ${p.telefono_cliente || ""}</div>` : `<div class="card-block"><b>🏠 Tipo</b>En local</div>`}
-      <div class="card-block"><b>Pago</b>${metodoPagoLabel(p.metodo_pago)}</div>
+      <div class="card-block"><b>Pago</b>${metodoPagoLabel(p.metodo_pago)}${p.metodo_pago === "qr" && p.llave_pago ? ` — Llave: <b>${p.llave_pago}</b>` : ""}</div>
 
-      <div class="card-block"><b>Vegetales</b>${p.vegetales.join(", ")}</div>
-      <div class="card-block"><b>Base</b>${p.base}</div>
-      <div class="card-block"><b>Complementos</b>${p.complementos.join(", ")}</div>
-      <div class="card-block"><b>Proteína</b>${p.proteina}</div>
-      <div class="card-block"><b>Salsa</b>${p.salsa}</div>
+      <div class="card-block"><b>Vegetales</b>${itemsConDobles(p.vegetales, "veg", p.dobles)}</div>
+      <div class="card-block"><b>Base</b>${itemsConDobles([p.base], "base", p.dobles)}</div>
+      <div class="card-block"><b>Complementos</b>${itemsConDobles(p.complementos, "comp", p.dobles)}</div>
+      <div class="card-block"><b>Proteína</b>${itemsConDobles([p.proteina], "prot", p.dobles)}</div>
+      <div class="card-block"><b>Salsa</b>${itemsConDobles([p.salsa], "salsa", p.dobles)}</div>
 
       <div class="card-total"><span>Total</span><span>${fmt(p.total)}</span></div>
 
